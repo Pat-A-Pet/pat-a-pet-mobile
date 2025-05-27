@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pat_a_pet/constants/colors.dart';
+import 'package:pat_a_pet/pages/signin/signin_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class OnBoardingScreen extends StatelessWidget {
@@ -64,31 +65,25 @@ class OnBoardingScreen extends StatelessWidget {
 class OnboardingController extends GetxController {
   static OnboardingController get instance => Get.find();
 
-  /// Variables
   final pageController = PageController();
   Rx<int> currentPageIndex = 0.obs;
 
-  /// update Current Index when Page Scroll
-  // void updatePageIndicator(index) => currentPageIndex = index;
   void updatePageIndicator(index) => currentPageIndex.value = index;
 
-  /// Jump to the specific dot selected page.
   void dotNavigationClick(index) {
     currentPageIndex.value = index;
     pageController.jumpTo(index);
   }
 
-  /// Update Current Index & jump to next page
   void nextPage() {
     if (currentPageIndex.value == 3) {
-      // Get.offAll(const LoginScreen());
+      Get.offAll(const SigninScreen());
     } else {
       int page = currentPageIndex.value + 1;
       pageController.jumpToPage(page);
     }
   }
 
-  /// Update Current Index & jump to the last Page
   void skipPage() {
     currentPageIndex.value = 3;
     pageController.jumpToPage(3);
@@ -111,16 +106,16 @@ class OnBoardingPage extends StatelessWidget {
       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
       child: Column(
         children: [
-          // Image(
-          //   image: AssetImage(image),
-          //   width: THelperFunctions.screenWidth() * 0.8,
-          //   height: THelperFunctions.screenHeight() * 0.4,
-          // ),
+          Image(
+            image: AssetImage(image),
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.4,
+          ),
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.95,
             child: Text(
               title,
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: TextStyle(fontFamily: "Nunito"),
               textAlign: TextAlign.center,
             ),
           ),
@@ -129,7 +124,7 @@ class OnBoardingPage extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.9,
             child: Text(
               subTitle,
-              style: const TextStyle(fontSize: 18),
+              style: const TextStyle(fontFamily: "PT Sans", fontSize: 18),
               textAlign: TextAlign.justify,
             ),
           ),
@@ -160,7 +155,10 @@ class OnBoardingSkip extends StatelessWidget {
       onPressed: () => OnboardingController.instance.skipPage(),
       child: const Text(
         'Skip',
-        style: TextStyle(color: ConstantsColors.textPrimary, fontSize: 14),
+        style: TextStyle(
+            fontFamily: "Nunito",
+            color: ConstantsColors.textPrimary,
+            fontSize: 14),
       ),
     );
   }
@@ -206,20 +204,11 @@ class OnBoardingNextButton extends StatelessWidget {
       onPressed: () => OnboardingController.instance.nextPage(),
       child: const Text(
         'Next',
-        style: TextStyle(color: ConstantsColors.textPrimary, fontSize: 14),
+        style: TextStyle(
+            fontFamily: "Nunito",
+            color: ConstantsColors.textPrimary,
+            fontSize: 14),
       ),
     );
-    //final dark = THelperFunctions.isDarkMode(context);
-    //
-    //return ElevatedButton(
-    //  onPressed: () => OnboardingController.instance.nextPage(),
-    //  style: ElevatedButton.styleFrom(
-    //      shape: const CircleBorder(),
-    //      backgroundColor: dark ? TColors.primary : Colors.black),
-    //  child: const Icon(
-    //    Iconsax.arrow_right_3,
-    //    color: Colors.white,
-    //  ),
-    //);
   }
 }

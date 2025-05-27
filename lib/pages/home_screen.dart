@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pat_a_pet/components/custom_appbar.dart';
 import 'package:pat_a_pet/constants/colors.dart';
+import 'package:pat_a_pet/controllers/user_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    final userController = Get.find<UserController>();
     return Scaffold(
         backgroundColor: ConstantsColors.background,
         appBar: CustomAppbar(

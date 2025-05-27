@@ -45,7 +45,8 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
       );
     } else if (title != null) {
       titleWidget = Text(title!,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold));
+          style: TextStyle(
+              fontFamily: "Nunito", fontSize: 20, fontWeight: FontWeight.bold));
     }
 
     return AppBar(

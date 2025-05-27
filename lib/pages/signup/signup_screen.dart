@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pat_a_pet/components/custom_appbar.dart';
 import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/pages/signup/signup_form.dart';
@@ -12,7 +11,6 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  // final userController = Get.find<UserController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,11 +26,10 @@ class _SignupScreenState extends State<SignupScreen> {
             height: MediaQuery.of(context).size.height,
             child: Column(
               children: [
-                /// Title
                 const SizedBox(height: 30),
                 Text(
                     "Please fill in the doctor's information accurately to create their account.",
-                    style: Theme.of(context).textTheme.bodySmall),
+                    style: TextStyle(fontFamily: "PT Sans")),
                 const SizedBox(height: 30),
                 SignupForm(),
               ],
