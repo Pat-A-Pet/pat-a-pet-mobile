@@ -98,7 +98,7 @@ class _SignupFormState extends State<SignupForm> {
             decoration: const InputDecoration(
               labelText: "Full Name",
               prefixIcon: Icon(Icons.person),
-              labelStyle: TextStyle(fontSize: 14),
+              labelStyle: TextStyle(fontFamily: "PT Sans", fontSize: 14),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -113,7 +113,7 @@ class _SignupFormState extends State<SignupForm> {
             decoration: const InputDecoration(
               labelText: "Email",
               prefixIcon: Icon(Icons.email),
-              labelStyle: TextStyle(fontSize: 14),
+              labelStyle: TextStyle(fontFamily: "PT Sans", fontSize: 14),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -143,7 +143,7 @@ class _SignupFormState extends State<SignupForm> {
                   });
                 },
               ),
-              labelStyle: const TextStyle(fontSize: 14),
+              labelStyle: TextStyle(fontFamily: "PT Sans", fontSize: 14),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -172,7 +172,7 @@ class _SignupFormState extends State<SignupForm> {
                   });
                 },
               ),
-              labelStyle: const TextStyle(fontSize: 14),
+              labelStyle: TextStyle(fontFamily: "PT Sans", fontSize: 14),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {

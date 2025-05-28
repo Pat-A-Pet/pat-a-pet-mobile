@@ -32,7 +32,7 @@ class NavigationMenu extends StatelessWidget {
             backgroundColor: Colors.white,
             color: ConstantsColors.accent,
             buttonBackgroundColor: Colors.white,
-            height: 78,
+            height: 72,
             index: controller.selectedIndex.value,
             onTap: (index) => controller.selectedIndex.value = index,
             items: navItems,
