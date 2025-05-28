@@ -190,9 +190,10 @@ class _SignupFormState extends State<SignupForm> {
             onChanged: (value) =>
                 setState(() => _isTermsChecked = value ?? false),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 40),
           SizedBox(
             width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.055,
             child: ElevatedButton(
               style: ButtonStyle(
                 backgroundColor:
@@ -207,7 +208,10 @@ class _SignupFormState extends State<SignupForm> {
                   : const Text(
                       "Create Account",
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w500),
+                          fontFamily: "Nunito",
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500),
                     ),
             ),
           ),

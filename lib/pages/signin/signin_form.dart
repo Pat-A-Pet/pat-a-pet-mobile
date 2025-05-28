@@ -121,10 +121,11 @@ class _SigninFormState extends State<SigninForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 50),
 
             SizedBox(
                 width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.055,
                 child: ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor:
@@ -142,6 +143,7 @@ class _SigninFormState extends State<SigninForm> {
                             "Signin",
                             style: TextStyle(
                                 fontFamily: "Nunito",
+                                fontSize: 18,
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500),
                           ))),
@@ -150,13 +152,15 @@ class _SigninFormState extends State<SigninForm> {
             /// Create Account Button
             SizedBox(
                 width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.055,
                 child: OutlinedButton(
                     onPressed: () => Get.to(() => const SignupScreen()),
                     child: const Text(
                       "Create Account",
                       style: TextStyle(
-                        fontFamily: "Nunito",
-                      ),
+                          fontFamily: "Nunito",
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500),
                     ))),
             // const SizedBox(height: TSizes.spaceBtwSections),
           ],

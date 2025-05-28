@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:pat_a_pet/components/custom_appbar.dart';
 import 'package:pat_a_pet/configs/api_config.dart';
 import 'package:pat_a_pet/configs/stream_chat_client_config.dart';
 import 'package:pat_a_pet/controllers/user_controller.dart';
@@ -33,6 +34,14 @@ class _InboxScreenState extends State<InboxScreen> {
         isConnecting = true;
         errorMessage = null;
       });
+
+      // Don't reconnect if already connected
+      if (streamClient.wsConnectionStatus == ConnectionStatus.connected) {
+        setState(() {
+          isConnecting = false;
+        });
+        return;
+      }
 
       final res = await http.post(
         Uri.parse(ApiConfig.fetchChatToken),
@@ -85,7 +94,9 @@ class _InboxScreenState extends State<InboxScreen> {
     return StreamChat(
       client: streamClient,
       child: Scaffold(
-        appBar: AppBar(title: const Text('Inbox')),
+        appBar: CustomAppbar(
+          logo: Image.asset("assets/images/logo_wo_picture.png"),
+        ),
         body: StreamChannelListView(
           controller: StreamChannelListController(
             client: streamClient,
@@ -110,4 +121,3 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 }
-

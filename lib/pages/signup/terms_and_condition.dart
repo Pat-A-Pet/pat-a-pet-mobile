@@ -18,25 +18,26 @@ class TermsAndConditions extends StatelessWidget {
             child: Checkbox(
               value: value,
               onChanged: onChanged,
-              activeColor: ConstantsColors.secondary,
+              activeColor: ConstantsColors.primary,
             )),
-        const SizedBox(width: 30),
+        const SizedBox(width: 10),
         Text.rich(TextSpan(children: [
-          TextSpan(text: 'I agree to', style: TextStyle(fontFamily: "PT Sans")),
+          TextSpan(
+              text: 'I agree to ', style: TextStyle(fontFamily: "PT Sans")),
           TextSpan(
               text: 'Privacy Policy',
               style: TextStyle(fontFamily: "PT Sans").apply(
-                color: ConstantsColors.secondary,
+                color: ConstantsColors.primary,
                 decoration: TextDecoration.underline,
-                decorationColor: ConstantsColors.secondary,
+                decorationColor: ConstantsColors.primary,
               )),
-          TextSpan(text: 'and', style: TextStyle(fontFamily: "PT Sans")),
+          TextSpan(text: ' and ', style: TextStyle(fontFamily: "PT Sans")),
           TextSpan(
               text: 'Terms of use',
               style: TextStyle(fontFamily: "PT Sans").apply(
-                color: ConstantsColors.secondary,
+                color: ConstantsColors.primary,
                 decoration: TextDecoration.underline,
-                decorationColor: ConstantsColors.secondary,
+                decorationColor: ConstantsColors.primary,
               )),
         ]))
       ],

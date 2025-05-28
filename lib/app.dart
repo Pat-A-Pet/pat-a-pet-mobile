@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/main.dart';
 import 'package:pat_a_pet/pages/home_screen.dart';
@@ -11,7 +12,7 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

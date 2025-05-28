@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pat_a_pet/components/navigation_menu.dart';
+import 'package:pat_a_pet/components/strocked_icon.dart';
 import 'package:pat_a_pet/configs/api_config.dart';
 import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/controllers/user_controller.dart';
@@ -121,8 +122,18 @@ class _ProfileState extends State<Profile> {
                   _buildSectionTitle('Your Pet Hub'),
                   _buildSettingItem(
                       OnTap: () => (),
-                      icon: Icons.question_mark,
-                      title: 'Frequently Asked Question',
+                      icon: Icons.pets,
+                      title: 'My Pets',
+                      color: ConstantsColors.secondary),
+                  _buildSettingItem(
+                      OnTap: () => (),
+                      icon: Icons.favorite,
+                      title: 'Loved Pets',
+                      color: ConstantsColors.secondary),
+                  _buildSettingItem(
+                      OnTap: () => (),
+                      icon: Icons.interests,
+                      title: 'My Activities',
                       color: ConstantsColors.secondary),
                   const SizedBox(height: 24),
                   _buildSectionTitle('Keluar'),
@@ -379,10 +390,12 @@ class _ProfileState extends State<Profile> {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              icon,
-              color: color,
+            child: StrokedIcon(
+              icon: icon,
               size: 20,
+              strokeColor: Colors.black,
+              strokeWidth: 0.5,
+              fillColor: color,
             ),
           ),
           title: Text(

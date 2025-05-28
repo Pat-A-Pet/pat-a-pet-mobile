@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(16),
                 color: Colors.white,
                 child: const Text(
-                  '83 pets listed | 23 adoptions',
+                  '🐶 83 pets listed | 🐾 23 adoptions',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontFamily: 'Nunito',

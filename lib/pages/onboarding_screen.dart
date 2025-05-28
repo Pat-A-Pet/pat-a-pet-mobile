@@ -19,25 +19,10 @@ class OnBoardingScreen extends StatelessWidget {
             controller: controller.pageController,
             onPageChanged: controller.updatePageIndicator,
             children: const [
-              // OnBoardingPage(
-              //     image: TImages.melanotectLogo,
-              //     title: TTexts.onBoardingTitle1,
-              //     // subTitle: TTexts.onBoardingSubTitle1),
-              //     subTitle:
-              //         "Deteksi melanoma dengan cepat dan mudah, AI kami akan membantu mengenalinya sejak dini."),
-              // OnBoardingPage(
-              //     image: TImages.onBoardingImage5,
-              //     title: TTexts.onBoardingTitle2,
-              //     subTitle: TTexts.onBoardingSubTitle2),
-              // OnBoardingPage(
-              //     image: TImages.onBoardingImage4,
-              //     title: "Verifikasi Langsung dari Dokter",
-              //     subTitle:
-              //         "Deteksi dari AI kami bisa diverifikasi secara langsung dengan dokter kulit yang tersedia"),
-              // OnBoardingPage(
-              //     image: TImages.onBoardingImage6,
-              //     title: TTexts.onBoardingTitle3,
-              //     subTitle: TTexts.onBoardingSubTitle3),
+              OnBoardingPage(image: "", title: "", subTitle: ""),
+              OnBoardingPage(image: "", title: "", subTitle: ""),
+              OnBoardingPage(image: "", title: "", subTitle: ""),
+              OnBoardingPage(image: "", title: "", subTitle: ""),
             ],
           ),
           Positioned(
