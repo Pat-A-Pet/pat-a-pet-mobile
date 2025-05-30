@@ -3,26 +3,28 @@ import 'package:pat_a_pet/constants/colors.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
-  final Widget? logo;
   final List<Widget>? actions;
   final bool showBackButton;
   final Color backgroundColor;
+  final PreferredSizeWidget? bottom;
 
   const CustomAppbar({
     super.key,
     this.title,
-    this.logo,
     this.actions,
     this.showBackButton = true,
     this.backgroundColor = ConstantsColors.accent,
+    this.bottom,
   });
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize =>
+      Size.fromHeight(kToolbarHeight + (bottom?.preferredSize.height ?? 0));
 
   @override
   Widget build(BuildContext context) {
     Widget? titleWidget;
+    Widget logo = Image.asset("assets/images/logo_wo_picture.png");
 
     // if (logo != null && title != null) {
     //   titleWidget = Row(
@@ -38,7 +40,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
     //     ],
     //   );
     // } else
-    if (logo != null) {
+    if (title == null) {
       titleWidget = SizedBox(
         height: 50,
         child: logo,
@@ -56,6 +58,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: showBackButton,
       actions: actions,
       elevation: 4,
+      bottom: bottom,
     );
   }
 }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:pat_a_pet/components/loader.dart';
 import 'package:pat_a_pet/configs/api_config.dart';
 import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/pages/signin/signin_screen.dart';
@@ -38,6 +39,14 @@ class _SignupFormState extends State<SignupForm> {
       try {
         setState(() => _isLoading = true);
 
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const Loader(),
+          ),
+        );
+
+        // Perform login operation
+        await Future.delayed(const Duration(seconds: 4)); // simulate loading
         final userData = {
           'fullname': _fullNameController.text,
           'email': _emailController.text,

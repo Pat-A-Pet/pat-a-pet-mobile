@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pat_a_pet/components/loader.dart';
 import 'package:pat_a_pet/components/navigation_menu.dart';
 import 'package:pat_a_pet/configs/api_config.dart';
 import 'package:pat_a_pet/constants/colors.dart';
@@ -32,7 +33,17 @@ class _SigninFormState extends State<SigninForm> {
     if (_formKey.currentState!.validate()) {
       try {
         setState(() => _isLoading = true);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const Loader(),
+          ),
+        );
 
+        // Perform login operation
+        await Future.delayed(const Duration(seconds: 4)); // simulate loading
+
+        // After loading complete:
+        Navigator.of(context).pop(); // pop loader
         final response = await http.post(
           Uri.parse(ApiConfig.signin),
           headers: {'Content-Type': 'application/json'},

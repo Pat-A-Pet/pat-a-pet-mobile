@@ -6,6 +6,7 @@ class StrokedIcon extends StatelessWidget {
   final Color strokeColor;
   final double strokeWidth;
   final Color fillColor;
+  final VoidCallback? onTap;
 
   const StrokedIcon({
     super.key,
@@ -14,14 +15,18 @@ class StrokedIcon extends StatelessWidget {
     required this.strokeColor,
     required this.strokeWidth,
     required this.fillColor,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: Size(size, size),
-      painter:
-          IconStrokePainter(icon, size, strokeColor, strokeWidth, fillColor),
+    return GestureDetector(
+      onTap: onTap,
+      child: CustomPaint(
+        size: Size(size, size),
+        painter:
+            IconStrokePainter(icon, size, strokeColor, strokeWidth, fillColor),
+      ),
     );
   }
 }
@@ -75,4 +80,3 @@ class IconStrokePainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
-

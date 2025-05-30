@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 import 'package:pat_a_pet/components/strocked_icon.dart';
 import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/pages/chat/inbox_screen.dart';
+import 'package:pat_a_pet/pages/community_screen.dart';
 import 'package:pat_a_pet/pages/home_screen.dart';
+import 'package:pat_a_pet/pages/listing_screen.dart';
 import 'package:pat_a_pet/pages/profile.dart';
 
 class NavigationMenu extends StatelessWidget {
@@ -29,13 +31,14 @@ class NavigationMenu extends StatelessWidget {
         bottomNavigationBar: Obx(() {
           return CurvedNavigationBar(
             iconPadding: 0,
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.transparent,
             color: ConstantsColors.accent,
-            buttonBackgroundColor: Colors.white,
+            buttonBackgroundColor: Colors.transparent,
             height: 72,
             index: controller.selectedIndex.value,
             onTap: (index) => controller.selectedIndex.value = index,
             items: navItems,
+            animationCurve: Curves.easeInOutSine,
           );
         }),
         body: Obx(() => controller.screens[controller.selectedIndex.value]),
@@ -56,7 +59,7 @@ class NavigationMenu extends StatelessWidget {
             strokeColor: selectedIndex == 0 ? Colors.black : Colors.transparent,
             strokeWidth: 1,
             fillColor:
-                selectedIndex == 0 ? ConstantsColors.secondary : Colors.grey,
+                selectedIndex == 0 ? ConstantsColors.secondary : Colors.black26,
           ),
           label: 'Home',
           labelStyle: TextStyle(fontFamily: "PT Sans")),
@@ -67,7 +70,7 @@ class NavigationMenu extends StatelessWidget {
             strokeColor: selectedIndex == 1 ? Colors.black : Colors.transparent,
             strokeWidth: 1,
             fillColor:
-                selectedIndex == 1 ? ConstantsColors.secondary : Colors.grey,
+                selectedIndex == 1 ? ConstantsColors.secondary : Colors.black26,
           ),
           label: 'Listing',
           labelStyle: TextStyle(fontFamily: "PT Sans")),
@@ -78,7 +81,7 @@ class NavigationMenu extends StatelessWidget {
             strokeColor: selectedIndex == 2 ? Colors.black : Colors.transparent,
             strokeWidth: 1,
             fillColor:
-                selectedIndex == 2 ? ConstantsColors.secondary : Colors.grey,
+                selectedIndex == 2 ? ConstantsColors.secondary : Colors.black26,
           ),
           label: 'Community',
           labelStyle: TextStyle(fontFamily: "PT Sans")),
@@ -89,7 +92,7 @@ class NavigationMenu extends StatelessWidget {
             strokeColor: selectedIndex == 3 ? Colors.black : Colors.transparent,
             strokeWidth: 1,
             fillColor:
-                selectedIndex == 3 ? ConstantsColors.secondary : Colors.grey,
+                selectedIndex == 3 ? ConstantsColors.secondary : Colors.black26,
           ),
           label: 'Inbox',
           labelStyle: TextStyle(fontFamily: "PT Sans")),
@@ -100,7 +103,7 @@ class NavigationMenu extends StatelessWidget {
             strokeColor: selectedIndex == 4 ? Colors.black : Colors.transparent,
             strokeWidth: 1,
             fillColor:
-                selectedIndex == 4 ? ConstantsColors.secondary : Colors.grey,
+                selectedIndex == 4 ? ConstantsColors.secondary : Colors.black26,
           ),
           label: 'Profile',
           labelStyle: TextStyle(fontFamily: "PT Sans")),
@@ -115,8 +118,8 @@ class NavigationController extends GetxController {
   List<Widget> get screens {
     return [
       const HomeScreen(),
-      // pet listing page
-      // community page
+      const ListingScreen(),
+      const CommunityScreen(),
       const InboxScreen(),
       const Profile(),
     ];

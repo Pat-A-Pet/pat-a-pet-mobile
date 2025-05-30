@@ -94,9 +94,7 @@ class _InboxScreenState extends State<InboxScreen> {
     return StreamChat(
       client: streamClient,
       child: Scaffold(
-        appBar: CustomAppbar(
-          logo: Image.asset("assets/images/logo_wo_picture.png"),
-        ),
+        appBar: CustomAppbar(),
         body: StreamChannelListView(
           controller: StreamChannelListController(
             client: streamClient,

@@ -14,6 +14,9 @@ import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/controllers/user_controller.dart';
 import 'package:pat_a_pet/pages/signin/signin_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:pat_a_pet/pages/your_pet_hub/loved_pets.dart';
+import 'package:pat_a_pet/pages/your_pet_hub/your_activities.dart';
+import 'package:pat_a_pet/pages/your_pet_hub/your_pets.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -121,20 +124,23 @@ class _ProfileState extends State<Profile> {
                   const SizedBox(height: 32),
                   _buildSectionTitle('Your Pet Hub'),
                   _buildSettingItem(
-                      OnTap: () => (),
+                      OnTap: () => (Get.to(YourPets())),
                       icon: Icons.pets,
-                      title: 'My Pets',
-                      color: ConstantsColors.secondary),
+                      title: 'Your Pets',
+                      color: ConstantsColors.secondary,
+                      titleColor: ConstantsColors.textPrimary),
                   _buildSettingItem(
-                      OnTap: () => (),
+                      OnTap: () => (Get.to(LovedPets())),
                       icon: Icons.favorite,
                       title: 'Loved Pets',
-                      color: ConstantsColors.secondary),
+                      color: ConstantsColors.secondary,
+                      titleColor: ConstantsColors.textPrimary),
                   _buildSettingItem(
-                      OnTap: () => (),
+                      OnTap: () => (Get.to(YourActivities())),
                       icon: Icons.interests,
-                      title: 'My Activities',
-                      color: ConstantsColors.secondary),
+                      title: 'Your Activities',
+                      color: ConstantsColors.secondary,
+                      titleColor: ConstantsColors.textPrimary),
                   const SizedBox(height: 24),
                   _buildSectionTitle('Keluar'),
                   _buildSettingItem(
@@ -143,13 +149,14 @@ class _ProfileState extends State<Profile> {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text("Perhatian!",
+                            title: const Text("Alert!",
                                 style: TextStyle(
                                     fontFamily: "Nunito",
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.red)),
-                            content: const Text("Anda yakin ingin keluar?",
+                            content: const Text(
+                                "Are you sure you want to quit?",
                                 style: TextStyle(
                                     fontFamily: "PT Sans",
                                     fontSize: 14,
@@ -163,8 +170,7 @@ class _ProfileState extends State<Profile> {
                                     (Set<WidgetState> states) {
                                       if (states
                                           .contains(WidgetState.pressed)) {
-                                        return const Color(
-                                            0xffD3E0EA); // color when pressed
+                                        return ConstantsColors.primary;
                                       }
                                       return Colors
                                           .transparent; // default color
@@ -175,7 +181,7 @@ class _ProfileState extends State<Profile> {
                                   Navigator.pop(context);
                                 },
                                 child: const Text(
-                                  "Tidak",
+                                  "No",
                                   style: TextStyle(
                                       fontFamily: "Nunito",
                                       fontSize: 14,
@@ -189,8 +195,8 @@ class _ProfileState extends State<Profile> {
                                     (Set<WidgetState> states) {
                                       if (states
                                           .contains(WidgetState.pressed)) {
-                                        return const Color(
-                                            0xffD3E0EA); // color when pressed
+                                        return ConstantsColors
+                                            .secondary; // color when pressed
                                       }
                                       return Colors
                                           .transparent; // default color
@@ -202,7 +208,7 @@ class _ProfileState extends State<Profile> {
                                 },
                                 //onPressed: () =>
                                 //    Get.to(() => const LoginScreen()),
-                                child: const Text("Yakin",
+                                child: const Text("Sure",
                                     style: TextStyle(
                                         fontFamily: "Nunito",
                                         fontSize: 14,
