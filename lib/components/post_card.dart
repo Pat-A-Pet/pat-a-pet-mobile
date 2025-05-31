@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pat_a_pet/constants/colors.dart';
+import 'package:pat_a_pet/models/post.dart';
 
 class PostCard extends StatefulWidget {
   final String avatarPath;
   final String username;
   final String postImagePath;
   final String postText;
-  final List<Map<dynamic, dynamic>>? comments;
+  final List<Comment>? comments;
 
   const PostCard({
     super.key,
@@ -26,12 +27,9 @@ class _PostCardState extends State<PostCard> {
   bool showComments = false;
   final TextEditingController _commentController = TextEditingController();
 
-  late List<Map<dynamic, dynamic>> localComments;
-
   @override
   void initState() {
     super.initState();
-    localComments = widget.comments ?? [];
   }
 
   void toggleLike() {
@@ -43,19 +41,6 @@ class _PostCardState extends State<PostCard> {
   void toggleComments() {
     setState(() {
       showComments = !showComments;
-    });
-  }
-
-  void addComment(String text) {
-    if (text.trim().isEmpty) return;
-
-    setState(() {
-      localComments.add({
-        'avatar': 'assets/images/logo.png', // or use current user's avatar path
-        'username': 'You', // or current user's username
-        'comment': text,
-      });
-      _commentController.clear();
     });
   }
 
@@ -132,63 +117,47 @@ class _PostCardState extends State<PostCard> {
           ),
 
           // Comments Section
-          if (showComments)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  const Divider(),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.linearToEaseOut,
+            child: showComments
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      children: [
+                        const Divider(),
+                        // Comments List
+                        const SizedBox(height: 12),
 
-                  // Comments List
-                  ...localComments.map((comment) {
-                    final avatar = comment['avatar'];
-                    final username = comment['username'];
-                    final text = comment['comment'];
-
-                    if (avatar is String &&
-                        username is String &&
-                        text is String) {
-                      return _buildComment(
-                        avatar: avatar,
-                        username: username,
-                        text: text,
-                      );
-                    } else {
-                      debugPrint('Invalid comment data: $comment');
-                      return const SizedBox.shrink();
-                    }
-                  }),
-
-                  const SizedBox(height: 12),
-
-                  // Text Field to Add Comment
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _commentController,
-                          decoration: const InputDecoration(
-                            hintText: 'Add a comment...',
-                            border: OutlineInputBorder(),
-                            contentPadding:
-                                EdgeInsets.symmetric(horizontal: 12),
-                          ),
-                          maxLines: 4,
-                          minLines: 1,
+                        // Text Field to Add Comment
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _commentController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Add a comment...',
+                                  border: OutlineInputBorder(),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 12),
+                                ),
+                                maxLines: 4,
+                                minLines: 1,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            IconButton(
+                                icon: const Icon(Icons.send,
+                                    color: ConstantsColors.primary),
+                                onPressed: () => {}),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(Icons.send,
-                            color: ConstantsColors.primary),
-                        onPressed: () => addComment(_commentController.text),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                ],
-              ),
-            ),
+                        const SizedBox(height: 12),
+                      ],
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );

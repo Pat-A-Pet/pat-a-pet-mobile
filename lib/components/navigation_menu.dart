@@ -36,12 +36,26 @@ class NavigationMenu extends StatelessWidget {
             buttonBackgroundColor: Colors.transparent,
             height: 72,
             index: controller.selectedIndex.value,
-            onTap: (index) => controller.selectedIndex.value = index,
+            onTap: controller.changeIndex,
             items: navItems,
             animationCurve: Curves.easeInOutSine,
           );
         }),
-        body: Obx(() => controller.screens[controller.selectedIndex.value]),
+        body: Obx(() {
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 150),
+            transitionBuilder: (child, animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            child: Container(
+              key: ValueKey<int>(controller.selectedIndex.value),
+              child: controller.screens[controller.selectedIndex.value],
+            ),
+          );
+        }),
       );
     });
   }
@@ -114,6 +128,7 @@ class NavigationMenu extends StatelessWidget {
 
 class NavigationController extends GetxController {
   final Rx<int> selectedIndex = 0.obs;
+  int _previousIndex = 0;
 
   List<Widget> get screens {
     return [
@@ -125,9 +140,18 @@ class NavigationController extends GetxController {
     ];
   }
 
+  void changeIndex(int newIndex) {
+    _previousIndex = selectedIndex.value;
+    selectedIndex.value = newIndex;
+  }
+
+  // Optional: For directional animations (if you want to implement later)
+  bool get isMovingForward => selectedIndex.value > _previousIndex;
+
   @override
   void onInit() {
     super.onInit();
     selectedIndex.value = 0;
+    _previousIndex = 0;
   }
 }

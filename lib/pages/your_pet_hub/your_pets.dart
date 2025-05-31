@@ -1,108 +1,61 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pat_a_pet/components/custom_appbar.dart';
 import 'package:pat_a_pet/components/your_pet_card.dart';
+import 'package:pat_a_pet/configs/api_config.dart';
 import 'package:pat_a_pet/constants/colors.dart';
+import 'package:pat_a_pet/controllers/user_controller.dart';
 import 'package:pat_a_pet/models/pet.dart';
 
-class YourPets extends StatefulWidget {
-  const YourPets({super.key});
+class MyPets extends StatefulWidget {
+  const MyPets({super.key});
 
   @override
-  State<YourPets> createState() => _YourPetsState();
+  State<MyPets> createState() => _MyPetsState();
 }
 
-class _YourPetsState extends State<YourPets> {
-  final pets = [
-    Pet(
-        imagePath: 'assets/images/logo.png',
-        name: 'Buddy',
-        location: 'New York',
-        sex: 'Male',
-        color: 'Brown',
-        breed: 'Golden Retriever',
-        weight: '25kg',
-        owner: 'John Doe',
-        description: 'A friendly and playful dog that loves the outdoors.',
-        status: "Adopted",
-        adoptedBy: "Bryan"),
-    Pet(
-      imagePath: 'assets/images/logo.png',
-      name: 'Buddy',
-      location: 'New York',
-      sex: 'Male',
-      color: 'Brown',
-      breed: 'Golden Retriever',
-      weight: '25kg',
-      owner: 'John Doe',
-      description: 'A friendly and playful dog that loves the outdoors.',
-    ),
-    Pet(
-      imagePath: 'assets/images/logo.png',
-      name: 'Buddy',
-      location: 'New York',
-      sex: 'Male',
-      color: 'Brown',
-      breed: 'Golden Retriever',
-      weight: '25kg',
-      owner: 'John Doe',
-      description: 'A friendly and playful dog that loves the outdoors.',
-    ),
-    Pet(
-      imagePath: 'assets/images/logo.png',
-      name: 'Buddy',
-      location: 'New York',
-      sex: 'Male',
-      color: 'Brown',
-      breed: 'Golden Retriever',
-      weight: '25kg',
-      owner: 'John Doe',
-      description: 'A friendly and playful dog that loves the outdoors.',
-    ),
-    Pet(
-      imagePath: 'assets/images/logo.png',
-      name: 'Buddy',
-      location: 'New York',
-      sex: 'Male',
-      color: 'Brown',
-      breed: 'Golden Retriever',
-      weight: '25kg',
-      owner: 'John Doe',
-      description: 'A friendly and playful dog that loves the outdoors.',
-    ),
-    Pet(
-      imagePath: 'assets/images/logo.png',
-      name: 'Buddy',
-      location: 'New York',
-      sex: 'Male',
-      color: 'Brown',
-      breed: 'Golden Retriever',
-      weight: '25kg',
-      owner: 'John Doe',
-      description: 'A friendly and playful dog that loves the outdoors.',
-    ),
-    Pet(
-      imagePath: 'assets/images/logo.png',
-      name: 'Buddy',
-      location: 'New York',
-      sex: 'Male',
-      color: 'Brown',
-      breed: 'Golden Retriever',
-      weight: '25kg',
-      owner: 'John Doe',
-      description: 'A friendly and playful dog that loves the outdoors.',
-    ),
-    Pet(
-      imagePath: 'assets/images/logo.png',
-      name: 'Buddy',
-      location: 'New York',
-      sex: 'Male',
-      color: 'Brown',
-      breed: 'Golden Retriever',
-      weight: '25kg',
-      owner: 'John Doe',
-      description: 'A friendly and playful dog that loves the outdoors.',
-    ),
-  ];
+class _MyPetsState extends State<MyPets> {
+  List<Pet> _pets = [];
+  bool _isLoading = false;
+  final userController = Get.find<UserController>();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserPets();
+  }
+
+  Future<void> _fetchUserPets() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final uri =
+        Uri.parse('${ApiConfig.getAllPetListings}?owner=${userController.id}');
+
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final List<dynamic> petJson = jsonDecode(response.body);
+        final pets = petJson.map((json) => Pet.fromJson(json)).toList();
+
+        setState(() {
+          _pets = pets;
+        });
+      } else {
+        print('Failed to load your pets: ${response.body}');
+      }
+    } catch (e) {
+      print('Error fetching your pets: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   void _showCreateNewPetListingDialog() {
     final _formKey = GlobalKey<FormState>();
     String imagePath = 'assets/images/logo.png'; // placeholder image
@@ -201,21 +154,21 @@ class _YourPetsState extends State<YourPets> {
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  setState(() {
-                    pets.add(
-                      Pet(
-                        imagePath: imagePath,
-                        name: name,
-                        location: location,
-                        sex: sex,
-                        color: color,
-                        breed: breed,
-                        weight: weight,
-                        owner: "John Doe",
-                        description: description,
-                      ),
-                    );
-                  });
+                  // setState(() {
+                  //   pets.add(
+                  //     Pet(
+                  //       imagePath: imagePath,
+                  //       name: name,
+                  //       location: location,
+                  //       sex: sex,
+                  //       color: color,
+                  //       breed: breed,
+                  //       weight: weight,
+                  //       owner: "John Doe",
+                  //       description: description,
+                  //     ),
+                  //   );
+                  // });
                   Navigator.pop(context);
                 }
               },
@@ -236,7 +189,7 @@ class _YourPetsState extends State<YourPets> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
-        title: "Your Pets",
+        title: "My Pets",
       ),
       body: Stack(children: [
         Padding(
@@ -245,21 +198,32 @@ class _YourPetsState extends State<YourPets> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: GridView.builder(
-                  itemCount: pets.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.60,
-                  ),
-                  itemBuilder: (context, index) {
-                    final pet = pets[index];
-                    return YourPetCard(
-                      pet: pet,
-                    );
-                  },
-                ),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _pets.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'You haven\'t listed any pets yet.',
+                              style: TextStyle(
+                                  fontFamily: "Nunito",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          )
+                        : GridView.builder(
+                            itemCount: _pets.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 0.60,
+                            ),
+                            itemBuilder: (context, index) {
+                              final pet = _pets[index];
+                              return YourPetCard(pet: pet);
+                            },
+                          ),
               ),
             ],
           ),

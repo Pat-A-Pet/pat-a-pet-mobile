@@ -122,11 +122,11 @@ class _ProfileState extends State<Profile> {
                     ],
                   ),
                   const SizedBox(height: 32),
-                  _buildSectionTitle('Your Pet Hub'),
+                  _buildSectionTitle('My Pet Hub'),
                   _buildSettingItem(
-                      OnTap: () => (Get.to(YourPets())),
+                      OnTap: () => (Get.to(MyPets())),
                       icon: Icons.pets,
-                      title: 'Your Pets',
+                      title: 'My Pets',
                       color: ConstantsColors.secondary,
                       titleColor: ConstantsColors.textPrimary),
                   _buildSettingItem(
@@ -136,9 +136,9 @@ class _ProfileState extends State<Profile> {
                       color: ConstantsColors.secondary,
                       titleColor: ConstantsColors.textPrimary),
                   _buildSettingItem(
-                      OnTap: () => (Get.to(YourActivities())),
+                      OnTap: () => (Get.to(MyActivities())),
                       icon: Icons.interests,
-                      title: 'Your Activities',
+                      title: 'My Activities',
                       color: ConstantsColors.secondary,
                       titleColor: ConstantsColors.textPrimary),
                   const SizedBox(height: 24),
