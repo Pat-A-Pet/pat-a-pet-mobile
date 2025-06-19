@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/main.dart';
-import 'package:pat_a_pet/pages/home_screen.dart';
-import 'package:pat_a_pet/pages/signin/signin_screen.dart';
-import 'package:pat_a_pet/pages/signup/signup_screen.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class App extends StatelessWidget {
   final Widget initialScreen;
-  const App({super.key, required this.initialScreen});
+  final StreamChatClient client;
+
+  const App({
+    super.key,
+    required this.initialScreen,
+    required this.client,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,17 @@ class App extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: ConstantsColors.primary),
         useMaterial3: true,
       ),
+      builder: (context, child) {
+        return StreamChat(
+          client: client,
+          child: StreamChatTheme(
+            data: StreamChatThemeData(),
+            child: child!,
+          ),
+        );
+      },
       home: initialScreen,
     );
   }
 }
+

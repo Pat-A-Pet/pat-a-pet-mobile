@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pat_a_pet/components/custom_appbar.dart';
 import 'package:pat_a_pet/components/post_card.dart';
 import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/configs/api_config.dart';
+import 'package:pat_a_pet/models/post.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -16,9 +19,10 @@ class CommunityScreen extends StatefulWidget {
 }
 
 class _CommunityScreenState extends State<CommunityScreen> {
+  final _secureStorage = FlutterSecureStorage();
   final ImagePicker _picker = ImagePicker();
   List<XFile> _selectedImages = [];
-  List<dynamic> _posts = [];
+  List<Post> _posts = [];
   bool _isLoading = false;
 
   @override
@@ -38,8 +42,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
       final response = await http.get(uri);
       if (response.statusCode == 200) {
         final List<dynamic> postJson = jsonDecode(response.body);
+        print("post: $postJson");
         setState(() {
-          _posts = postJson;
+          _posts = postJson.map((json) => Post.fromJson(json)).toList();
         });
       } else {
         print('Failed to load posts: ${response.body}');
@@ -55,130 +60,337 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   void _showAddPostDialog() {
     String newPostText = '';
+    final textController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(builder: (context, setState) {
-          return AlertDialog(
-            scrollable: true,
-            title: const Text('Create New Post'),
-            content: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  maxLines: 5,
-                  minLines: 2,
-                  onChanged: (value) {
-                    newPostText = value;
-                  },
-                  decoration: const InputDecoration(
-                    hintText: 'Write your caption here…',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                if (_selectedImages.isNotEmpty)
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _selectedImages.map((img) {
-                      return Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.file(
-                              File(img.path),
-                              width: 80,
-                              height: 80,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedImages.remove(img);
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                color: Colors.black54,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.close,
-                                  color: Colors.white, size: 16),
-                            ),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final List<XFile> images = await _picker.pickMultiImage();
-                    if (images.isNotEmpty) {
-                      setState(() {
-                        _selectedImages.addAll(images);
-                      });
-                    }
-                  },
-                  icon: const Icon(Icons.image, color: Colors.white),
-                  label: const Text('Add Images',
-                      style:
-                          TextStyle(fontFamily: "Nunito", color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.primary,
-                  ),
-                ),
-              ],
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  _selectedImages.clear();
-                  Navigator.pop(context);
-                },
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (newPostText.isNotEmpty || _selectedImages.isNotEmpty) {
-                    // Locally add new post (mock, or send POST request to your backend here)
-                    setState(() {
-                      _posts.insert(0, {
-                        'author': {
-                          'fullname': 'CurrentUser',
-                          'profilePictureUrl': 'assets/images/logo.png'
-                        },
-                        'images': _selectedImages.map((x) => x.path).toList(),
-                        'text': newPostText,
-                        'comments': [],
-                      });
-                    });
-                    _selectedImages.clear();
-                    Navigator.pop(context);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ConstantsColors.primary,
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.6,
                 ),
-                child: const Text('Post',
-                    style:
-                        TextStyle(fontFamily: "Nunito", color: Colors.white)),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Create New Post',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Nunito",
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(height: 24, thickness: 1),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            TextField(
+                              controller: textController,
+                              maxLines: 5,
+                              minLines: 2,
+                              onChanged: (value) => newPostText = value,
+                              decoration: InputDecoration(
+                                hintText: 'What\'s on your mind?',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade300,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: ConstantsColors.primary,
+                                    width: 2,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.all(16),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            if (_selectedImages.isNotEmpty)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Selected Images (${_selectedImages.length})',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  SizedBox(
+                                    height: 120,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: _selectedImages.length,
+                                      itemBuilder: (context, index) {
+                                        final img = _selectedImages[index];
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 8.0),
+                                          child: Stack(
+                                            alignment: Alignment.topRight,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                child: Image.file(
+                                                  File(img.path),
+                                                  width: 120,
+                                                  height: 120,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    _selectedImages
+                                                        .removeAt(index);
+                                                  });
+                                                },
+                                                child: Container(
+                                                  margin:
+                                                      const EdgeInsets.all(4),
+                                                  padding:
+                                                      const EdgeInsets.all(4),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black
+                                                        .withOpacity(0.7),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(Icons.close,
+                                                      color: Colors.white,
+                                                      size: 16),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                ],
+                              ),
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final List<XFile> images =
+                                    await _picker.pickMultiImage(
+                                  maxWidth: 1000,
+                                  maxHeight: 1000,
+                                  imageQuality: 85,
+                                );
+                                if (images.isNotEmpty) {
+                                  setState(() {
+                                    _selectedImages.addAll(images);
+                                  });
+                                }
+                              },
+                              icon:
+                                  const Icon(Icons.image, color: Colors.white),
+                              label: const Text('Add Images',
+                                  style: TextStyle(
+                                      fontFamily: "Nunito",
+                                      color: Colors.white)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ConstantsColors.primary,
+                                padding: EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            _selectedImages.clear();
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontFamily: "Nunito",
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (newPostText.trim().isEmpty &&
+                                _selectedImages.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Please add text or images'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return;
+                            }
+
+                            await _createPost(newPostText, _selectedImages);
+                            _selectedImages.clear();
+                            if (mounted) Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ConstantsColors.primary,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Post',
+                            style: TextStyle(
+                                fontFamily: "Nunito", color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           );
         });
       },
     );
   }
 
+  Future<void> _createPost(String caption, List<XFile> images) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Create multipart request
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(ApiConfig.createPost),
+      );
+
+      // Add authorization header
+      final token = await _secureStorage.read(key: 'jwt');
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // Add text fields
+      request.fields['captions'] = caption;
+
+      // Add image files
+      for (var image in images) {
+        // Check if file exists
+        final file = File(image.path);
+        if (!await file.exists()) {
+          print('File does not exist: ${image.path}');
+          continue;
+        }
+
+        // Get file extension to determine content type
+        final extension = image.path.split('.').last.toLowerCase();
+        final contentType = extension == 'png'
+            ? MediaType('image', 'png')
+            : extension == 'jpg' || extension == 'jpeg'
+                ? MediaType('image', 'jpeg')
+                : MediaType('image', extension);
+
+        var multipartFile = await http.MultipartFile.fromPath(
+          'images', // Must match the field name in your backend
+          image.path,
+          contentType: contentType,
+        );
+        request.files.add(multipartFile);
+      }
+
+      // Debug print
+      print('Sending request with:');
+      print('Caption: $caption');
+      print('Files count: ${request.files.length}');
+
+      // Send request
+      var response = await request.send();
+      final respStr = await response.stream.bytesToString();
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: $respStr');
+
+      if (response.statusCode == 201) {
+        // Refresh posts after successful creation
+        await _fetchPosts();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Post created successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to create post: $respStr'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error creating post: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error creating post: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppbar(),
+      appBar: CustomAppbar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: ConstantsColors.textPrimary),
+            onPressed: _showAddPostDialog,
+          ),
+        ],
+      ),
       body: Stack(children: [
         _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -199,35 +411,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     itemBuilder: (context, index) {
                       final post = _posts[index];
                       return PostCard(
-                        avatarPath: post['author']?['profilePictureUrl'] ??
-                            'assets/images/logo.png',
-                        username: post['author']?['fullname'] ?? 'Unknown',
-                        postImagePath:
-                            post['images'] != null && post['images'].isNotEmpty
-                                ? post['images'][0]
-                                : 'assets/images/logo.png',
-                        postText: post['text'] ?? '',
-                        comments: post['comments'] ?? [],
+                        post: post,
                       );
                     },
                   ),
-        Positioned(
-          bottom: -24,
-          right: MediaQuery.of(context).size.width * 0.42,
-          left: MediaQuery.of(context).size.width * 0.42,
-          child: FloatingActionButton(
-            onPressed: () {
-              _showAddPostDialog();
-            },
-            backgroundColor: ConstantsColors.primary,
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-          ),
-        ),
       ]),
     );
   }
 }
-

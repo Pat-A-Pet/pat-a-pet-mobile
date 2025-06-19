@@ -10,13 +10,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:pat_a_pet/components/navigation_menu.dart';
 import 'package:pat_a_pet/components/strocked_icon.dart';
 import 'package:pat_a_pet/configs/api_config.dart';
+import 'package:pat_a_pet/configs/stream_chat_client_config.dart';
 import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/controllers/user_controller.dart';
+import 'package:pat_a_pet/pages/my_pet_hub/my_adoptions.dart';
 import 'package:pat_a_pet/pages/signin/signin_screen.dart';
 import 'package:http/http.dart' as http;
-import 'package:pat_a_pet/pages/your_pet_hub/loved_pets.dart';
-import 'package:pat_a_pet/pages/your_pet_hub/your_activities.dart';
-import 'package:pat_a_pet/pages/your_pet_hub/your_pets.dart';
+import 'package:pat_a_pet/pages/my_pet_hub/loved_pets.dart';
+import 'package:pat_a_pet/pages/my_pet_hub/my_activities.dart';
+import 'package:pat_a_pet/pages/my_pet_hub/my_pets/my_pets.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -38,8 +40,9 @@ class _ProfileState extends State<Profile> {
     await secureStorage.delete(key: 'profilePictureUrl'); // Remove the token
     await secureStorage.delete(key: 'refreshToken'); // Remove the token
     await secureStorage.delete(key: 'userData'); // Remove the token
-    Get.delete<NavigationController>();
+    await streamClient.disconnectUser();
     Get.offAll(() => const SigninScreen()); // Navigate to login
+    Get.delete<NavigationController>();
   }
 
   @override
@@ -136,13 +139,24 @@ class _ProfileState extends State<Profile> {
                       color: ConstantsColors.secondary,
                       titleColor: ConstantsColors.textPrimary),
                   _buildSettingItem(
+                      OnTap: () => (Get.to(MyAdoptions())),
+                      icon: Icons.house,
+                      title: 'My Adoptions',
+                      color: ConstantsColors.secondary,
+                      titleColor: ConstantsColors.textPrimary),
+                  _buildSettingItem(
                       OnTap: () => (Get.to(MyActivities())),
                       icon: Icons.interests,
                       title: 'My Activities',
                       color: ConstantsColors.secondary,
                       titleColor: ConstantsColors.textPrimary),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle('Keluar'),
+                  const SizedBox(height: 12),
+                  const Divider(
+                    indent: 20,
+                    endIndent: 20,
+                  ),
+                  const SizedBox(height: 12),
+                  // _buildSectionTitle('Quit'),
                   _buildSettingItem(
                     OnTap: () {
                       showDialog(

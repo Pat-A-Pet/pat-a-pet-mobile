@@ -7,6 +7,7 @@ class ApiConfig {
   static const String signup = '$baseUrl/auth/signup';
   static const String signin = '$baseUrl/auth/signin';
   static const String profile = '$baseUrl/auth/profile';
+  static const String refreshToken = '$baseUrl/auth/refresh-token';
 
   // profile picture
   static const String uploadProfilePicture =
@@ -16,31 +17,43 @@ class ApiConfig {
 
   // getstreams
   static String fetchChatToken = '$baseUrl/chat/chatToken';
+  static String createChannel = '$baseUrl/chat/create-channel';
 
   // Pet Listings
   static const String createPetListing = '$baseUrl/pets/create-listing';
+  static const String uploadPetImages = '$baseUrl/pets/upload-pet-images';
   static const String getAllPetListings = '$baseUrl/pets/get-listings';
+  static String getPetListingById(String id) => '$baseUrl/pets/get-listing/$id';
   static const String getAllPetCategories = '$baseUrl/pets/categories';
   static String getAllLovedPets(String userId) =>
       '$baseUrl/pets/get-loved-pets/$userId';
-  // static String getPetListingById(String id) => '$baseUrl/pets/get-listing/$id';
   static String updatePetListing(String id) =>
       '$baseUrl/pets/update-listing/$id';
-  static String deletePetListing(String id) =>
-      '$baseUrl/pets/delete-listing/$id';
+  static String deletePetListing(String petId) =>
+      '$baseUrl/pets/delete-listing/$petId';
+  static String lovePetListing(String petId) => '$baseUrl/pets/pet-love/$petId';
+  static String getAllAdoptionsBuyer(String userId) =>
+      '$baseUrl/pets/get-all-adoptions-buyer/$userId';
+  static String requestAdoption(String petId) =>
+      '$baseUrl/pets/request-adoption/$petId';
+  static String cancelRequestAdoption(String petId) =>
+      '$baseUrl/pets/cancel-request-adoption/$petId';
+  static String updateRequestStatus(String petId, String requestId) =>
+      "$baseUrl/pets/update-request-status/$petId/$requestId";
+  static String getAllAdoptionsOwner(String petId) =>
+      '$baseUrl/pets/get-adoption-requests/$petId';
 
   // Posts
   static const String createPost = '$baseUrl/posts/create-post';
   static const String getAllPosts = '$baseUrl/posts/get-posts';
   static String getAllUserPosts(String userId) =>
-      '$baseUrl/pets/get-my-posts/$userId';
+      '$baseUrl/posts/get-my-posts/$userId';
   static String getAllLovedPosts(String userId) =>
-      '$baseUrl/pets/get-loved-posts/$userId';
-  // static String getPostById(String id) => '$baseUrl/posts/get-posts/$id';
-  static String updatePost(String id) => '$baseUrl/posts/update-post/$id';
-  static String deletePost(String id) => '$baseUrl/posts/delete-post/$id';
-  static String addCommentToPost(String id) =>
-      '$baseUrl/posts/update-post/$id/comments';
-  static String likeOrUnlikePost(String id) =>
-      '$baseUrl/posts/update-post/$id/like';
+      '$baseUrl/posts/get-loved-posts/$userId';
+  static String deletePost(String postId) =>
+      '$baseUrl/posts/delete-post/$postId';
+  static String addCommentToPost(String postId) =>
+      '$baseUrl/posts/post-comments/$postId/';
+  static String lovePostListing(String postId) =>
+      '$baseUrl/posts/post-love/$postId';
 }

@@ -18,11 +18,32 @@ class OnBoardingScreen extends StatelessWidget {
           PageView(
             controller: controller.pageController,
             onPageChanged: controller.updatePageIndicator,
-            children: const [
-              OnBoardingPage(image: "", title: "", subTitle: ""),
-              OnBoardingPage(image: "", title: "", subTitle: ""),
-              OnBoardingPage(image: "", title: "", subTitle: ""),
-              OnBoardingPage(image: "", title: "", subTitle: ""),
+            children: [
+              OnBoardingPage(
+                image: "assets/images/logo_w_picture.png",
+                title: "Welcome to Pat-A-Pet! 🐾",
+                subTitle:
+                    "Your go-to app for pet adoption, selling, and community!",
+                last: false,
+              ),
+              OnBoardingPage(
+                  image: "assets/images/hold_dog_1.png",
+                  title: "One More Friend Thousands More Fun! ❤️",
+                  subTitle:
+                      "Browse pets for adoption or list your own for a loving new home.",
+                  last: false),
+              OnBoardingPage(
+                  image: "assets/images/hold_dog_2.png",
+                  title: "Share & Connect with Fellow Pet Owners 🐶🐱",
+                  subTitle:
+                      "Post stories, tips, and photos of your furry friends in our community.",
+                  last: false),
+              OnBoardingPage(
+                image: "assets/images/puppies.png",
+                title: "Ready to Dive In?",
+                subTitle: "Join thousands of pet lovers today!",
+                last: true,
+              ),
             ],
           ),
           Positioned(
@@ -76,14 +97,15 @@ class OnboardingController extends GetxController {
 }
 
 class OnBoardingPage extends StatelessWidget {
-  const OnBoardingPage({
-    super.key,
-    required this.image,
-    required this.title,
-    required this.subTitle,
-  });
+  const OnBoardingPage(
+      {super.key,
+      required this.image,
+      required this.title,
+      required this.subTitle,
+      this.last = false});
 
   final String image, title, subTitle;
+  final bool last;
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +122,10 @@ class OnBoardingPage extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.95,
             child: Text(
               title,
-              style: TextStyle(fontFamily: "Nunito"),
+              style: TextStyle(
+                  fontFamily: "Nunito",
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
@@ -110,7 +135,7 @@ class OnBoardingPage extends StatelessWidget {
             child: Text(
               subTitle,
               style: const TextStyle(fontFamily: "PT Sans", fontSize: 18),
-              textAlign: TextAlign.justify,
+              textAlign: last == true ? TextAlign.center : TextAlign.justify,
             ),
           ),
         ],

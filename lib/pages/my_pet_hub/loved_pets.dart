@@ -1,11 +1,11 @@
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pat_a_pet/components/custom_appbar.dart';
 import 'package:pat_a_pet/components/pet_listing_card.dart';
 import 'package:pat_a_pet/configs/api_config.dart';
-import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/controllers/user_controller.dart';
 import 'package:pat_a_pet/models/pet.dart';
 
@@ -20,6 +20,7 @@ class _LovedPetsState extends State<LovedPets> {
   List<Pet> _pets = [];
   bool _isLoading = false;
   final userController = Get.find<UserController>();
+  final _secureStorage = FlutterSecureStorage();
 
   @override
   void initState() {
@@ -28,6 +29,7 @@ class _LovedPetsState extends State<LovedPets> {
   }
 
   Future<void> _fetchLovedPets() async {
+    final token = await _secureStorage.read(key: 'jwt');
     setState(() {
       _isLoading = true;
     });
@@ -35,7 +37,15 @@ class _LovedPetsState extends State<LovedPets> {
     final uri = Uri.parse(ApiConfig.getAllLovedPets(userController.id));
 
     try {
-      final response = await http.get(uri);
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      print("statusCode: ${response.statusCode}");
+      print("body: ${response.body}");
       if (response.statusCode == 200) {
         final List<dynamic> petJson = jsonDecode(response.body);
         final pets = petJson.map((json) => Pet.fromJson(json)).toList();

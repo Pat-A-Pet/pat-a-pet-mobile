@@ -42,7 +42,7 @@ class _ListingScreenState extends State<ListingScreen> {
           return {
             'name': name,
             'icon': Icons.pets, // or assign icons dynamically if desired
-            'color': Colors.grey, // or assign colors dynamically
+            'color': ConstantsColors.primary, // or assign colors dynamically
           };
         }).toList();
 
@@ -75,6 +75,8 @@ class _ListingScreenState extends State<ListingScreen> {
 
     try {
       final response = await http.get(uri);
+
+      print("response body: ${response.body}");
       if (response.statusCode == 200) {
         final List<dynamic> petJson = jsonDecode(response.body);
         final pets = petJson.map((json) => Pet.fromJson(json)).toList();

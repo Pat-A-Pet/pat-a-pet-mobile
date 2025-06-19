@@ -10,7 +10,9 @@ import 'package:pat_a_pet/components/navigation_menu.dart';
 import 'package:pat_a_pet/configs/api_config.dart';
 import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/controllers/user_controller.dart';
+import 'package:pat_a_pet/main.dart';
 import 'package:pat_a_pet/pages/signup/signup_screen.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class SigninForm extends StatefulWidget {
   const SigninForm({
@@ -29,6 +31,7 @@ class _SigninFormState extends State<SigninForm> {
   bool _isLoading = false;
   bool _isHidden = true;
 
+// Modify your loginUser function like this:
   Future<void> loginUser() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -39,11 +42,6 @@ class _SigninFormState extends State<SigninForm> {
           ),
         );
 
-        // Perform login operation
-        await Future.delayed(const Duration(seconds: 4)); // simulate loading
-
-        // After loading complete:
-        Navigator.of(context).pop(); // pop loader
         final response = await http.post(
           Uri.parse(ApiConfig.signin),
           headers: {'Content-Type': 'application/json'},
@@ -61,6 +59,34 @@ class _SigninFormState extends State<SigninForm> {
           final userController = Get.find<UserController>();
           userController.setUser(user);
           await secureStorage.write(key: 'jwt', value: token);
+
+          // Get Stream Chat token and connect user
+          final chatTokenRes = await http.post(
+            Uri.parse(ApiConfig.fetchChatToken),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json'
+            },
+            body: jsonEncode({'userId': user['_id']}),
+          );
+
+          print("Body ${response.body}");
+          print("statusCode ${response.statusCode}");
+
+          if (chatTokenRes.statusCode == 200) {
+            final chatTokenBody = json.decode(chatTokenRes.body);
+            final chatToken = chatTokenBody['token'];
+
+            await streamClient
+                .disconnectUser(); // Disconnect previous user if any
+            await streamClient.connectUser(
+              User(
+                id: user['_id'],
+                extraData: {'name': user['fullname']},
+              ),
+              chatToken,
+            );
+          }
 
           Get.offAll(() => const NavigationMenu());
         } else {

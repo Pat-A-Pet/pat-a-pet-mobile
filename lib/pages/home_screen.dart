@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:pat_a_pet/components/custom_appbar.dart';
@@ -9,6 +10,7 @@ import 'package:pat_a_pet/components/pet_listing_card.dart';
 import 'package:pat_a_pet/controllers/user_controller.dart';
 import 'package:pat_a_pet/models/pet.dart';
 import 'package:pat_a_pet/configs/api_config.dart';
+import 'package:pat_a_pet/models/post.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,16 +21,106 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Pet> _pets = [];
-  List<dynamic> _communityPosts = [];
+  List<Post> _communityPosts = [];
   bool _isLoadingPets = false;
   bool _isLoadingPosts = false;
+  bool _isRefreshingToken = false;
   final userController = Get.find<UserController>();
+  final _secureStorage = const FlutterSecureStorage();
+  var petsListedCounts = 0;
+  var adoptionsCounts = 0;
 
   @override
   void initState() {
     super.initState();
-    _fetchLatestPets();
-    _fetchLatestPosts();
+    _initializeHomeScreen();
+  }
+
+  Future<void> _initializeHomeScreen() async {
+    // First, try to refresh the token
+    final refreshSuccess = await _refreshTokenIfNeeded();
+
+    // Only fetch data if token refresh was successful or not needed
+    if (refreshSuccess) {
+      await Future.wait([
+        _fetchLatestPets(),
+        _fetchLatestPosts(),
+      ]);
+    } else {
+      // Handle the case where refresh failed (user might be logged out)
+    }
+  }
+
+  Future<bool> _refreshTokenIfNeeded() async {
+    // Check if we even have a token that might need refreshing
+    final jwt = await _secureStorage.read(key: 'jwt');
+    if (jwt != null) {
+      return true; // Token is still valid
+    }
+
+    setState(() {
+      _isRefreshingToken = true;
+    });
+
+    try {
+      final refreshToken = await _secureStorage.read(key: 'refresh_token');
+      if (refreshToken == null) {
+        print('No refresh token found');
+        await _handleTokenExpired();
+        return false;
+      }
+
+      final uri = Uri.parse(ApiConfig.refreshToken);
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'refreshToken': refreshToken}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final newToken = responseData['token'];
+
+        // Validate the new token before storing
+        if (newToken == null || newToken.isEmpty) {
+          throw Exception('Invalid token received');
+        }
+
+        await _secureStorage.write(key: 'jwt', value: newToken);
+        print('Token refreshed successfully');
+        return true;
+      } else {
+        print('Failed to refresh token: ${response.statusCode}');
+        await _handleTokenExpired();
+        return false;
+      }
+    } catch (e) {
+      print('Error refreshing token: $e');
+      await _handleTokenExpired();
+      return false;
+    } finally {
+      setState(() {
+        _isRefreshingToken = false;
+      });
+    }
+  }
+
+  Future<void> _handleTokenExpired() async {
+    // Clear all stored tokens
+    await _secureStorage.delete(key: 'jwt');
+    await _secureStorage.delete(key: 'refresh_token');
+
+    // Show error message
+    Get.snackbar(
+      'Session Expired',
+      'Please log in again',
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+
+    // Navigate to login screen
+    // Replace 'LoginScreen' with your actual login route
+    Get.offAllNamed('/login');
   }
 
   Future<void> _fetchLatestPets() async {
@@ -46,7 +138,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // limit to 5 pets for home preview
         setState(() {
-          _pets = pets.take(5).toList();
+          petsListedCounts = pets.toList().length;
+          adoptionsCounts = pets.where((pet) => pet.status == 'adopted').length;
+          _pets = pets.take(2).toList();
         });
       } else {
         print('Failed to load pets: ${response.body}');
@@ -74,7 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // limit to 3 posts for home preview
         setState(() {
-          _communityPosts = postJson.take(3).toList();
+          _communityPosts =
+              postJson.map((json) => Post.fromJson(json)).take(1).toList();
         });
       } else {
         print('Failed to load posts: ${response.body}');
@@ -146,7 +241,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     itemCount: _pets.length,
                                     itemBuilder: (context, index) {
                                       final pet = _pets[index];
-                                      return PetListingCard(pet: pet);
+                                      return PetListingCard(
+                                        pet: pet,
+                                      );
                                     },
                                   ),
                                 ),
@@ -175,17 +272,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               : Column(
                                   children: _communityPosts.map((post) {
                                     return PostCard(
-                                      avatarPath: post['author']
-                                              ?['profilePictureUrl'] ??
-                                          'assets/images/logo.png',
-                                      username: post['author']?['fullname'] ??
-                                          'Unknown',
-                                      postImagePath: (post['images'] != null &&
-                                              post['images'].isNotEmpty)
-                                          ? post['images'][0]
-                                          : 'assets/images/logo.png',
-                                      postText: post['text'] ?? '',
-                                      comments: post['comments'] ?? [],
+                                      post: post,
                                     );
                                   }).toList(),
                                 ),
@@ -201,7 +288,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(16),
                     color: Colors.white,
                     child: Text(
-                      '🐶 ${_pets.length} pets listed | 🐾 ${_pets.where((pet) => pet.status == 'adopted').length} adoptions',
+                      '🐶 $petsListedCounts pets listed | 🐾 $adoptionsCounts adoptions',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Nunito',
