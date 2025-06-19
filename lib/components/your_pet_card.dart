@@ -17,8 +17,9 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class YourPetCard extends StatefulWidget {
   final Pet pet;
+  final VoidCallback? onRequestUpdated; // Add this callback
 
-  const YourPetCard({super.key, required this.pet});
+  const YourPetCard({super.key, required this.pet, this.onRequestUpdated});
 
   @override
   State<YourPetCard> createState() => _YourPetCardState();
@@ -75,7 +76,8 @@ class _YourPetCardState extends State<YourPetCard> {
                 ),
                 // Add adoption requests badge if there are pending requests
                 if (widget.pet.adoptionRequests!.isNotEmpty &&
-                    widget.pet.status == "available")
+                    widget.pet.status == "available" &&
+                    _adoptionRequests.isNotEmpty)
                   Positioned(
                     top: 8,
                     right: 8,
@@ -86,7 +88,7 @@ class _YourPetCardState extends State<YourPetCard> {
                         shape: BoxShape.circle,
                       ),
                       child: Text(
-                        '${widget.pet.adoptionRequests!.length}',
+                        '${_adoptionRequests.length}',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -203,28 +205,29 @@ class _YourPetCardState extends State<YourPetCard> {
                   const SizedBox(height: 8),
 
                   // Edit + Delete buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      StrokedIcon(
-                        strokeColor: Colors.black,
-                        strokeWidth: 0.6,
-                        icon: Icons.edit,
-                        size: 20,
-                        fillColor: ConstantsColors.secondary,
-                        onTap: _showEditPetListingDialog,
-                      ),
-                      const SizedBox(width: 12),
-                      StrokedIcon(
-                        strokeColor: Colors.black,
-                        strokeWidth: 0.6,
-                        icon: Icons.delete,
-                        size: 20,
-                        fillColor: ConstantsColors.secondary,
-                        onTap: _confirmDelete,
-                      ),
-                    ],
-                  ),
+                  if (widget.pet.status != "adopted")
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        StrokedIcon(
+                          strokeColor: Colors.black,
+                          strokeWidth: 0.6,
+                          icon: Icons.edit,
+                          size: 20,
+                          fillColor: ConstantsColors.secondary,
+                          onTap: _showEditPetListingDialog,
+                        ),
+                        const SizedBox(width: 12),
+                        StrokedIcon(
+                          strokeColor: Colors.black,
+                          strokeWidth: 0.6,
+                          icon: Icons.delete,
+                          size: 20,
+                          fillColor: ConstantsColors.secondary,
+                          onTap: _confirmDelete,
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -255,12 +258,14 @@ class _YourPetCardState extends State<YourPetCard> {
 
       if (response.statusCode == 200) {
         // Refresh the requests
-        await _fetchAdoptionRequests();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
                   'Request ${action == 'approve' ? 'approved' : 'rejected'}')),
         );
+        Navigator.pop(context);
+        _showAdoptionRequestsDialog();
+        await _fetchAdoptionRequests();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -287,9 +292,15 @@ class _YourPetCardState extends State<YourPetCard> {
         },
       );
 
+      print("adoptionreq: ${response.body}");
+
       if (response.statusCode == 200) {
         setState(() {
-          _adoptionRequests = jsonDecode(response.body);
+          final responseData = jsonDecode(response.body);
+          // Filter to only show pending requests
+          _adoptionRequests = responseData
+              .where((request) => request['status'] == "pending")
+              .toList();
         });
       }
     } catch (e) {
@@ -595,6 +606,10 @@ class _YourPetCardState extends State<YourPetCard> {
               backgroundColor: Colors.green,
             ),
           );
+          // Notify parent widget of changes
+          if (widget.onRequestUpdated != null) {
+            widget.onRequestUpdated!();
+          }
           // You might want to refresh the parent widget's state here
           // For example, if this is in a list, you could call a callback
           // to refresh the list

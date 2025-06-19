@@ -177,7 +177,7 @@ class _SigninFormState extends State<SigninForm> {
                             color: Colors.white,
                           )
                         : const Text(
-                            "Signin",
+                            "Sign in",
                             style: TextStyle(
                                 fontFamily: "Nunito",
                                 fontSize: 18,

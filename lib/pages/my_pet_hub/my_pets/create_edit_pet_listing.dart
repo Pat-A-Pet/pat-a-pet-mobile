@@ -15,12 +15,10 @@ import 'package:pat_a_pet/models/pet.dart';
 class CreateEditPetListingScreen extends StatefulWidget {
   final Pet? pet;
   final bool isEditMode;
+  final VoidCallback? onPetCreated;
 
-  const CreateEditPetListingScreen({
-    super.key,
-    this.pet,
-    this.isEditMode = false,
-  });
+  const CreateEditPetListingScreen(
+      {super.key, this.pet, this.isEditMode = false, this.onPetCreated});
 
   @override
   State<CreateEditPetListingScreen> createState() =>
@@ -443,6 +441,9 @@ class _CreateEditPetListingScreenState
       backgroundColor: Colors.green,
       colorText: Colors.white,
     );
+    if (widget.onPetCreated != null) {
+      widget.onPetCreated!;
+    }
   }
 
   void _handleApiError(http.Response response) {

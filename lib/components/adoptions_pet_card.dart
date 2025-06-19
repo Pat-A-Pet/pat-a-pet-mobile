@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pat_a_pet/components/strocked_icon.dart';
 import 'package:pat_a_pet/configs/api_config.dart';
-import 'package:pat_a_pet/configs/stream_chat_client_config.dart';
 import 'package:pat_a_pet/constants/colors.dart';
 import 'package:pat_a_pet/controllers/user_controller.dart';
+import 'package:pat_a_pet/main.dart';
 import 'package:pat_a_pet/models/pet.dart';
 import 'package:pat_a_pet/pages/chat/chatting_screen.dart';
 import 'package:pat_a_pet/pages/pet_detail_page.dart';
@@ -16,9 +16,13 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 class AdoptionsPetCard extends StatefulWidget {
   final Pet pet;
   final bool isCompletedAdoption;
+  final VoidCallback? onCancelSuccess; // Add this callback
 
   const AdoptionsPetCard(
-      {super.key, required this.pet, this.isCompletedAdoption = false});
+      {super.key,
+      required this.pet,
+      this.isCompletedAdoption = false,
+      this.onCancelSuccess});
 
   @override
   State<AdoptionsPetCard> createState() => _AdoptionsPetCardState();
@@ -156,20 +160,21 @@ class _AdoptionsPetCardState extends State<AdoptionsPetCard> {
                   const SizedBox(height: 8),
 
                   // Edit + Delete buttons
-                  if (request.status != 'rejected' &&
-                      widget.isCompletedAdoption == false)
+                  if (request.status != 'rejected')
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        StrokedIcon(
-                          strokeColor: Colors.black,
-                          strokeWidth: 0.6,
-                          icon: Icons.cancel,
-                          size: 20,
-                          fillColor: ConstantsColors.secondary,
-                          onTap: _showCancelConfirmationDialog,
-                        ),
-                        const SizedBox(width: 12),
+                        if (!widget.isCompletedAdoption) ...[
+                          StrokedIcon(
+                            strokeColor: Colors.black,
+                            strokeWidth: 0.6,
+                            icon: Icons.cancel,
+                            size: 20,
+                            fillColor: ConstantsColors.secondary,
+                            onTap: _showCancelConfirmationDialog,
+                          ),
+                          const SizedBox(width: 12),
+                        ],
                         StrokedIcon(
                           strokeColor: Colors.black,
                           strokeWidth: 0.6,
@@ -284,11 +289,10 @@ class _AdoptionsPetCardState extends State<AdoptionsPetCard> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Adoption request canceled successfully')),
         );
-        // Optionally refresh the parent widget's data
-        // if (mounted) {
-        //   Navigator.of(context).pop(); // Close if in dialog
-        //   // Or trigger a refresh in the parent widget
-        // }
+        // Call the callback if it exists
+        if (widget.onCancelSuccess != null) {
+          widget.onCancelSuccess!();
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to cancel request: ${response.body}')),

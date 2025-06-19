@@ -133,15 +133,15 @@ class _ProfileState extends State<Profile> {
                       color: ConstantsColors.secondary,
                       titleColor: ConstantsColors.textPrimary),
                   _buildSettingItem(
-                      OnTap: () => (Get.to(LovedPets())),
-                      icon: Icons.favorite,
-                      title: 'Loved Pets',
-                      color: ConstantsColors.secondary,
-                      titleColor: ConstantsColors.textPrimary),
-                  _buildSettingItem(
                       OnTap: () => (Get.to(MyAdoptions())),
                       icon: Icons.house,
                       title: 'My Adoptions',
+                      color: ConstantsColors.secondary,
+                      titleColor: ConstantsColors.textPrimary),
+                  _buildSettingItem(
+                      OnTap: () => (Get.to(LovedPets())),
+                      icon: Icons.favorite,
+                      title: 'Loved Pets',
                       color: ConstantsColors.secondary,
                       titleColor: ConstantsColors.textPrimary),
                   _buildSettingItem(
@@ -235,7 +235,7 @@ class _ProfileState extends State<Profile> {
                       );
                     },
                     icon: Icons.logout,
-                    title: 'Logout',
+                    title: 'Log out',
                     color: Colors.red,
                     titleColor: Colors.red,
                   ),

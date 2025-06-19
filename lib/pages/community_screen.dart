@@ -351,6 +351,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ),
           );
         }
+        await _fetchPosts();
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

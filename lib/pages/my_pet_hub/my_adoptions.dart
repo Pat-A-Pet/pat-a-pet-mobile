@@ -88,38 +88,6 @@ class _MyAdoptionsState extends State<MyAdoptions>
     }
   }
 
-  Widget _buildAdoptionsList(List<Pet> adoptions, String emptyMessage) {
-    if (adoptions.isEmpty) {
-      return Center(
-        child: Text(
-          emptyMessage,
-          style: const TextStyle(
-            fontFamily: "Nunito",
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    }
-
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: adoptions.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.65,
-      ),
-      itemBuilder: (context, index) {
-        final pet = adoptions[index];
-        return AdoptionsPetCard(
-          pet: pet,
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,45 +104,69 @@ class _MyAdoptionsState extends State<MyAdoptions>
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _errorMessage != null
-                ? Center(child: Text(_errorMessage!))
+                ? Center(
+                    child: Text(
+                    _errorMessage!,
+                    style: TextStyle(fontFamily: "PT Sans", fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ))
                 : TabBarView(
                     controller: _tabController,
                     children: [
                       // Requested Adoptions Tab
-                      RefreshIndicator(
-                        onRefresh: _fetchAdoptions,
-                        child: GridView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _requestedAdoptions.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.7,
-                          ),
-                          itemBuilder: (context, index) => AdoptionsPetCard(
-                            pet: _requestedAdoptions[index],
-                            isCompletedAdoption: false,
-                          ),
-                        ),
-                      ),
+                      _requestedAdoptions.isEmpty
+                          ? Center(
+                              child: Text(
+                              "You haven't adopted any pet,\nadopt one now 🐱",
+                              style: TextStyle(
+                                  fontFamily: "PT Sans", fontSize: 18),
+                              textAlign: TextAlign.center,
+                            ))
+                          : RefreshIndicator(
+                              onRefresh: _fetchAdoptions,
+                              child: GridView.builder(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: _requestedAdoptions.length,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio: 0.7,
+                                ),
+                                itemBuilder: (context, index) =>
+                                    AdoptionsPetCard(
+                                  pet: _requestedAdoptions[index],
+                                  isCompletedAdoption: false,
+                                  onCancelSuccess: _fetchAdoptions,
+                                ),
+                              ),
+                            ),
 
                       // Completed Adoptions Tab
-                      RefreshIndicator(
-                        onRefresh: _fetchAdoptions,
-                        child: GridView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _completedAdoptions.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.7,
-                          ),
-                          itemBuilder: (context, index) => AdoptionsPetCard(
-                            pet: _completedAdoptions[index],
-                            isCompletedAdoption: true,
-                          ),
-                        ),
-                      ),
+                      _completedAdoptions.isEmpty
+                          ? Center(
+                              child: Text(
+                              "No completed adoptions yet 🐾",
+                              style: TextStyle(
+                                  fontFamily: "PT Sans", fontSize: 18),
+                              textAlign: TextAlign.center,
+                            ))
+                          : RefreshIndicator(
+                              onRefresh: _fetchAdoptions,
+                              child: GridView.builder(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: _completedAdoptions.length,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio: 0.7,
+                                ),
+                                itemBuilder: (context, index) =>
+                                    AdoptionsPetCard(
+                                  pet: _completedAdoptions[index],
+                                  isCompletedAdoption: true,
+                                ),
+                              ),
+                            ),
                     ],
                   ));
   }

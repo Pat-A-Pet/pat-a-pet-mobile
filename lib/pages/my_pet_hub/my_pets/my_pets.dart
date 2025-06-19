@@ -65,8 +65,8 @@ class _MyPetsState extends State<MyPets> {
       builder: (context) => FractionallySizedBox(
         heightFactor: 0.95,
         child: CreateEditPetListingScreen(
-            // onPetCreated: _fetchUserPets,
-            ),
+          onPetCreated: _fetchUserPets,
+        ),
       ),
     );
   }
@@ -116,6 +116,7 @@ class _MyPetsState extends State<MyPets> {
                               final pet = _pets[index];
                               return YourPetCard(
                                 pet: pet,
+                                onRequestUpdated: () => _fetchUserPets(),
                               );
                             },
                           ),
